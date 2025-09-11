@@ -40,18 +40,18 @@ To run this project, you need Node.js and npm installed.
 3.  **Create Project Structure:**
     Create a `src` directory and the two files we will be working with.
     ```bash
-    touch src/AgentMonad.ts
+    touch src/Monadic.ts
     touch src/main.ts
     ```
 
 ---
 
-## 3. The MCE Core Library (`src/AgentMonad.ts`)
+## 3. The MCE Core Library (`src/Monadic.ts`)
 
 This file contains the core implementation of the `AgentMonad`, including its type definition and the API (`then`, `map`, `gather`, etc.) for creating and composing agentic workflows. It is the direct translation of the MCE framework from the paper into code.
 
 ```typescript
-// src/AgentMonad.ts
+// src/Monadic.ts
 
 import { pipe } from 'fp-ts/lib/function';
 import *s from 'fp-ts/lib/StateT';
