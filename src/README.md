@@ -213,7 +213,7 @@ import *TE from 'fp-ts/lib/TaskEither';
 import { spawn } from 'child_process'; // Use the safer 'spawn' for command execution
 
 // Import our powerful MCE library!
-import * as MCE from './AgentMonad';
+import * as MCE from './Monadic';
 
 // --- Define Agent's State and Error types ---
 interface AgentState {
