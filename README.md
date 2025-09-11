@@ -1,6 +1,10 @@
 # Monadic Context Engineering: A Principled Framework for AI Agent Orchestration
 
-**Yifan Zhang (Princeton University)**
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/license/apache-2-0)
+![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
+[![Website](https://img.shields.io/badge/Project-Website-green)](https://yifanzhang-pro.github.io/monadic-context-engineering) 
+
+Author: [**Yifan Zhang**](https://yifzhang.com) **(Princeton University)** 
 
 A principled, functional framework for building robust, scalable, and verifiable AI agents using the algebraic structures of Functors, Applicatives, and Monads.
 
