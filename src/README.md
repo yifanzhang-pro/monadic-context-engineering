@@ -231,7 +231,7 @@ type AgentError =
 // --- Dedicated, Safe Gemini CLI Invocation ---
 // This function is our bridge to the real world. It explicitly calls the 'gemini' command.
 const invokeGemini = (args: string[]): TE.TaskEither<AgentError, string> => {
-    console.log(`\n�� Spawning: gemini ${args.join(' ')}`);
+    console.log(`\n Spawning: gemini ${args.join(' ')}`);
 
     // We wrap the callback/event-based `spawn` API in a Promise,
     // which can then be lifted into a TaskEither.
@@ -333,7 +333,7 @@ const synthesizeAnswer = (toolOutput: any): MCE.AgentMonad<AgentState, AgentErro
 // --- Orchestrate and Run the Agent ---
 
 const main = async () => {
-    console.log("�� STARTING: Flow with REAL `gemini-cli` calls via a dedicated invoker.");
+    console.log(" STARTING: Flow with REAL `gemini-cli` calls via a dedicated invoker.");
     const initialState: AgentState = { task: "Explain Monadic Context Engineering in simple terms", history: [] };
 
     // The agent's entire logic is a declarative, linear chain of operations.
@@ -353,7 +353,7 @@ const main = async () => {
     pipe(
         result,
         E.match(
-            (error) => console.error(`\n�� FLOW FAILED: ${error}`),
+            (error) => console.error(`\n FLOW FAILED: ${error}`),
             ([value, state]) => {
                 console.log(`\n\n✨ FLOW SUCCEEDED! ✨`);
                 console.log(value);
@@ -384,13 +384,13 @@ npx ts-node src/main.ts
 You will see the logs from the `invokeGemini` function, followed by the final result of the monadic flow. The output will look similar to this (Gemini's responses may vary):
 
 ```
-�� STARTING: Flow with REAL `gemini-cli` calls via a dedicated invoker.
+ STARTING: Flow with REAL `gemini-cli` calls via a dedicated invoker.
 
-�� Spawning: gemini gen Create a simple, one-step plan to answer the question: "Explain Monadic Context Engineering in simple terms". The plan should involve using a 'search' tool. Respond with only the plan string.
+ Spawning: gemini gen Create a simple, one-step plan to answer the question: "Explain Monadic Context Engineering in simple terms". The plan should involve using a 'search' tool. Respond with only the plan string.
 
-�� Spawning: gemini gen You are a search tool. Fulfill this task: "Explain Monadic Context Engineering in simple terms". Respond with a JSON object like {"result": "your findings"}. --json
+ Spawning: gemini gen You are a search tool. Fulfill this task: "Explain Monadic Context Engineering in simple terms". Respond with a JSON object like {"result": "your findings"}. --json
 
-�� Spawning: gemini gen Based on this JSON data: {"result":"Monadic Context Engineering is a functional programming paradigm for building robust AI agents. It uses monads to manage state, errors, and side-effects in a structured way."}, write a final, user-friendly answer for the task: "Explain Monadic Context Engineering in simple terms"
+ Spawning: gemini gen Based on this JSON data: {"result":"Monadic Context Engineering is a functional programming paradigm for building robust AI agents. It uses monads to manage state, errors, and side-effects in a structured way."}, write a final, user-friendly answer for the task: "Explain Monadic Context Engineering in simple terms"
 
 
 ✨ FLOW SUCCEEDED! ✨
