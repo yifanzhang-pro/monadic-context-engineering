@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monadic Context Engineering: A Principled Framework for AI Agent Orchestration</title>
+
+    <meta name="description" content="A principled, functional framework using Monads for building robust, scalable, and verifiable AI agents by cleanly managing state, errors, and side-effects.">
+    <meta name="keywords" content="Monadic Context Engineering, MCE, AI Agents, Functional Programming, Monads, Agent Orchestration, State Management, Error Handling, Concurrency, LLM">
+    <meta name="citation_title" content="Monadic Context Engineering: A Principled Framework for AI Agent Orchestration">
+    <meta name="citation_author" content="Yifan Zhang">
+    <meta name="citation_publication_date" content="2025/09/11">
+    <meta name="citation_pdf_url" content="https://yifanzhang-pro.github.io/monadic-context-engineering/paper.pdf"> <meta property="og:title" content="Monadic Context Engineering: A Principled Framework for AI Agent Orchestration"/>
+    <meta property="og:description" content="MCE provides a functional paradigm for building robust AI agents, using monads to manage state, errors, and asynchronicity in a composable way."/>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yifanzhang-pro.github.io/monadic-context-engineering/" />
+    <link rel="canonical" href="https://yifanzhang-pro.github.io/monadic-context-engineering/">
+    <link rel="icon" href="https://placehold.co/32x32/004080/FFFFFF?text=MCE" type="image/x-icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #004080; /* Princeton Orange might be too bright, let's stick to a professional navy */
+            --accent-color: #CFB87C;  
+            --main-bg: #FFFFFF;
+            --content-bg: #F8F9FA;
+            --text-main: #363636;
+            --text-on-primary: #FFFFFF;
+            --link-color: var(--primary-color);
+            --link-hover-color: #0059b3;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--main-bg);
+            color: var(--text-main);
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Sticky Navbar */
+        .navbar {
+            background-color: rgba(var(--primary-color-rgb), 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 5px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand a.navbar-item, .navbar-menu a.navbar-item {
+            color: var(--text-on-primary);
+            font-weight: 500;
+        }
+        .navbar-brand a.navbar-item:hover, .navbar-menu a.navbar-item:hover, .navbar-item.is-active {
+            background-color: transparent !important;
+            color: var(--accent-color) !important;
+        }
+        .navbar-burger { color: var(--text-on-primary); }
+
+        /* Hero Section */
+        .hero {
+            background: var(--primary-color);
+            color: var(--text-on-primary);
+        }
+        .hero .title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--text-on-primary);
+            font-size: 3.2rem;
+        }
+        .hero .subtitle.is-hero-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 1.5rem auto 2.5rem auto;
+        }
+        .hero .subtitle .highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        .project-links a {
+            color: var(--text-on-primary);
+            font-size: 1.5rem;
+            margin: 0 0.75rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .project-links a:hover {
+            color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        /* Content Sections */
+        .section.content-section {
+            padding: 5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .section.content-section:nth-child(even) { background-color: var(--content-bg); }
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 3rem;
+        }
+        .content {
+            max-width: 960px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        .content a {
+            color: var(--link-color);
+            font-weight: 500;
+            text-decoration: none;
+            border-bottom: 2px solid rgba(var(--link-color-rgb), 0.2);
+        }
+        .content a:hover {
+            color: var(--link-hover-color);
+            border-bottom-color: var(--link-hover-color);
+        }
+        .content img {
+            display: block;
+            margin: 2rem auto;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .content pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            border-radius: 6px;
+            padding: 1.25em;
+            white-space: pre-wrap;
+        }
+        code {
+            background-color: #f0f0f0;
+            color: #3a3a3a;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 85%;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: inherit;
+        }
+
+
+        /* Footer */
+        .footer {
+            background: var(--primary-color);
+            color: var(--text-on-primary);
+            padding: 2rem 1.5rem;
+            border-top: 4px solid var(--accent-color);
+            margin-top: auto;
+        }
+        .footer .content p { color: var(--text-on-primary); }
+        .footer a {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        .footer a:hover { color: var(--text-on-primary); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item is-size-5 has-text-weight-bold" href="#">Monadic Context Engineering</a>
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div id="navbarMenu" class="navbar-menu">
+                <div class="navbar-end">
+                    <a href="#about" class="navbar-item">About</a>
+                    <a href="#architecture" class="navbar-item">Architecture</a>
+                    <a href="#example" class="navbar-item">Example</a>
+                    <a href="#meta-agents" class="navbar-item">Meta-Agents</a>
+                    <a href="#citation" class="navbar-item">Citation</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero is-medium">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title">Monadic Context Engineering:<br>A Principled Framework for AI Agent Orchestration</h1>
+                <h2 class="subtitle is-hero-subtitle">
+                    Moving from brittle, imperative scripts to a <span class="highlight">principled, functional architecture</span> for building robust, scalable, and verifiable AI agents.
+                </h2>
+                <h3 class="subtitle is-5" style="color: rgba(255, 255, 255, 0.9); margin-top: 2rem; margin-bottom: 2rem;">
+                    <a href="https://yifanzhang.me/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(207, 184, 124, 0.6);">Yifan Zhang</a>
+                </h3>
+                <h4 class="subtitle is-6" style="color: rgba(255, 255, 255, 0.8);">Princeton University</h4>
+                <div class="project-links">
+                    <a href="https://yifanzhang-pro.github.io/monadic-context-engineering/paper.pdf" target="_blank" rel="noopener noreferrer" aria-label="Paper"><i class="fas fa-file-pdf"></i></a>
+                    <a href="https://arxiv.org/abs/2509.XXXXX" target="_blank" rel="noopener noreferrer" aria-label="arXiv"><i class="fas fa-graduation-cap"></i></a> <a href="https://github.com/yifanzhang-pro/monadic-context-engineering" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#citation" aria-label="Citation"><i class="fas fa-quote-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="about" class="section content-section">
+            <div class="container">
+                <h2 class="title is-3 has-text-centered section-title">Abstract</h2>
+                <div class="content has-text-justified" style="max-width: 800px; margin: 0 auto;">
+                    <p>
+                        The proliferation of powerful Large Language Models (LLMs) has catalyzed a shift towards creating autonomous agents capable of complex reasoning and tool use. However, prevailing agent architectures are frequently developed imperatively, leading to brittle systems plagued by challenges in state management, error handling, concurrency, and compositionality. This ad-hoc approach impedes the development of scalable, reliable, and verifiable agents. This paper introduces <strong>Monadic Context Engineering (MCE)</strong>, a novel architectural paradigm that leverages the algebraic structures of Functors, Applicative Functors, and Monads to provide a formal foundation for agent design.
+                    </p>
+                    <p>
+                        MCE treats agentic workflows as computational contexts where cross-cutting concerns—state propagation, error short-circuiting, asynchronous execution, and side-effect isolation—are handled intrinsically by the algebraic properties of the abstraction. This layered approach allows developers to construct complex, resilient, and efficient AI agents from simple, highly-composable, and independently verifiable components, fostering code that is more legible, maintainable, and formally tractable.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="section content-section">
+            <div class="container">
+                <h2 class="title is-3 has-text-centered section-title">The MCE Architecture</h2>
+                <div class="content">
+                    <p class="has-text-centered">
+                        MCE replaces tangled control flow with a "railway" for computation. If any step fails, the entire workflow is shunted to a failure track, skipping all subsequent steps and preserving the original error.
+                    </p>
+                    <img src="https://i.imgur.com/k4QY7pU.png" alt="Illustration of the Monad's bind operation as a railway switch." style="max-width: 800px;">
+                    <p>
+                        This is achieved by building the <code>AgentMonad</code> as a <strong>monad transformer stack</strong>, a principled way to layer computational contexts. Each layer adds a new capability without disrupting the ones below it.
+                    </p>
+                    <img src="https://i.imgur.com/gK1B988.png" alt="Diagram showing the construction of AgentMonad by stacking Monad Transformers: StateT, EitherT, and IO/Task." style="max-width: 700px;">
+                    <p>
+                        The final structure, <code>StateT S (EitherT E IO) A</code>, is a single, unified container that formally manages the three primary challenges of agent engineering:
+                    </p>
+                    <ul>
+                        <li><strong>Stateful Logic (<code>StateT S</code>):</strong> Manages the agent's memory and world model in a purely functional way, ensuring state integrity across operations.</li>
+                        <li><strong>Robust Error Handling (<code>EitherT E</code>):</strong> Provides principled, short-circuiting error handling, eliminating defensive boilerplate code.</li>
+                        <li><strong>Side-Effects & Asynchronicity (<code>IO/Task</code>):</strong> Encapsulates interactions with the external world (e.g., API calls, file I/O), making agent behavior observable, testable, and controllable.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="example" class="section content-section">
+            <div class="container">
+                <h2 class="title is-3 has-text-centered section-title">Declarative Orchestration in Practice</h2>
+                <div class="content">
+                    <p>
+                        The MCE approach leads to agent logic that is declarative and far more maintainable than its imperative equivalent. Compare the two styles below for the same simple research agent.
+                    </p>
+                    <div class="columns">
+                        <div class="column">
+                            <h4 class="title is-5 has-text-centered">Monadic Style (MCE)</h4>
+                            <p>A clean, linear chain. Error handling and state passing are implicit in the <code>.then()</code> operation.</p>
+<pre><code># The entire agent logic is a single, readable, 
+# and robust chain.
+final_flow = AgentMonad.init(initial_state) \
+    .then(plan_action) \
+    .then(execute_tool) \
+    .then(synthesize_answer) \
+    .map(lambda answer: f"Final Report: {answer}")</code></pre>
+                        </div>
+                        <div class="column">
+                            <h4 class="title is-5 has-text-centered">Imperative Style</h4>
+                            <p>Logic is obscured by repetitive <code>try/except</code> blocks and manual state management.</p>
+<pre><code>def imperative_agent_flow(initial_state):
+    state = initial_state.copy()
+    try:
+        plan = plan_action_imp(state['task'])
+        state['history'].append(plan)
+    except Exception as e:
+        state['error'] = f"Planning failed: {e}"
+        return state # First exit point
+
+    try:
+        tool_output = execute_tool_imp(plan)
+        state['history'].append(tool_output)
+    except Exception as e:
+        state['error'] = f"Tool failed: {e}"
+        return state # Second exit point
+
+    # ... and so on for every step ...
+    return state</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="meta-agents" class="section content-section">
+            <div class="container">
+                <h2 class="title is-3 has-text-centered section-title">Scaling with Meta-Agents: Generative Orchestration</h2>
+                <div class="content">
+                    <p>
+                        The MCE paradigm scales from orchestrating a single agent to orchestrating a team of agents. We introduce the <strong>Meta-Agent</strong>: a higher-level agent whose function is to dynamically create, configure, and supervise a team of specialized sub-agents. The Meta-Agent acts as a metaprogrammer, where the values it operates on are not domain data, but entire monadic workflows for its sub-agents to execute.
+                    </p>
+                    <img src="https://i.imgur.com/8QzXyq9.png" alt="Diagram showing a Meta-Agent's monadic flow orchestrating sub-agent workflows.">
+                    <p class="has-text-centered is-size-7">
+                        <strong>Figure:</strong> A Meta-Agent's monadic flow. Each step of its <code>.then()</code> chain orchestrates the creation and execution of entire monadic workflows for specialized sub-agents. The results are then gathered back into the Meta-Agent's context for synthesis.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="citation" class="section content-section">
+            <div class="container">
+                <h2 class="title is-3 has-text-centered section-title">Citation</h2>
+                <div class="content">
+                    <p>If you find this work useful in your research, please cite our paper:</p>
+<pre><code>@misc{zhang2025monadic,
+    title={Monadic Context Engineering: A Principled Framework for AI Agent Orchestration}, 
+    author={Yifan Zhang},
+    year={2025},
+}</code></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="content has-text-centered">
+                <p>
+                    <a href="#about">About</a> &nbsp;&bull;&nbsp;
+                    <a href="#architecture">Architecture</a> &nbsp;&bull;&nbsp;
+                    <a href="#example">Example</a> &nbsp;&bull;&nbsp;
+                    <a href="#meta-agents">Meta-Agents</a> &nbsp;&bull;&nbsp;
+                    <a href="#citation">Citation</a>
+                </p>
+                <p>
+                    &copy; 2025 Yifan Zhang. All rights reserved. Website template adapted from the <a href="https://github.com/general-preference/general-preference-model" target="_blank" rel="noopener noreferrer">GPM project</a>.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript for the mobile navbar toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+            if ($navbarBurgers.length > 0) {
+                $navbarBurgers.forEach( el => {
+                    el.addEventListener('click', () => {
+                        const target = el.dataset.target;
+                        const $target = document.getElementById(target);
+                        el.classList.toggle('is-active');
+                        $target.classList.toggle('is-active');
+                    });
+                });
+            }
+
+            // Function to convert hex to rgb for rgba() usage
+            function hexToRgb(hex) {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+
+            // Set RGB versions of colors for use in rgba()
+            const root = document.documentElement;
+            const styles = getComputedStyle(root);
+            const primaryColor = styles.getPropertyValue('--primary-color').trim();
+            const linkColor = styles.getPropertyValue('--link-color').trim();
+
+            const primaryRgb = hexToRgb(primaryColor);
+            if (primaryRgb) {
+                root.style.setProperty('--primary-color-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`);
+            }
+
+            const linkRgb = hexToRgb(linkColor);
+            if (linkRgb) {
+                root.style.setProperty('--link-color-rgb', `${linkRgb.r}, ${linkRgb.g}, ${linkRgb.b}`);
+            }
+        });
+    </script>
+
+</body>
+</html>
