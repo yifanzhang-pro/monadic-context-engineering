@@ -255,8 +255,12 @@ If you find this framework useful in your research, please consider citing our p
 
 ```bibtex
 @article{zhang2025monadic,
-  title={Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
-  author={Zhang, Yifan},
-  journal={arXiv preprint arXiv:2509},
-  year={2025}
+  title   = {Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
+  author  = {Zhang, Yifan},
+  year    = {2025},
+  month   = {sep},
+  journal = {Github},
+  url     = {https://yifanzhang-pro.github.io/monadic-context-engineering/Monadic_Context_Engineering.pdf}
 }
+```
+
