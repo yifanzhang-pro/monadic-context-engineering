@@ -254,7 +254,7 @@ You will see the logs from the `gemini-cli` calls, followed by the final, format
 If you find this framework useful in your research, please consider citing our paper:
 
 ```bibtex
-@article{zhang2023monadic,
+@article{zhang2025monadic,
   title={Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
   author={Zhang, Yifan},
   journal={arXiv preprint arXiv:2509},
