@@ -1,8 +1,10 @@
-# Monadic Context Engineering: A Principled Framework for AI Agent Orchestration
+# Monadic Context Engineering
 
 [![Website](https://img.shields.io/badge/Project-Website-green)](https://yifanzhang-pro.github.io/monadic-context-engineering) 
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-yellow.svg)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/license/apache-2-0)
+
+### A Principled Framework for AI Agent Orchestration 
 
 
 Author: [**Yifan Zhang**](https://yifzhang.com) **(Princeton University)** et al. 
@@ -256,7 +258,7 @@ If you find this framework useful in your research, please consider citing our p
 
 ```bibtex
 @article{zhang2025monadic,
-  title   = {Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
+  title   = {Monadic Context Engineering},
   author  = {Zhang, Yifan and et al.},
   year    = {2025},
   month   = {sep},
