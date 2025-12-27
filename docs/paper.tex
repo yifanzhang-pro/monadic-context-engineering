@@ -234,14 +234,17 @@ To demonstrate MCE in practice, we present a simple agent that answers the quest
 The agent logic is decomposed into four composable steps. First, \texttt{plan\_action} uses an LLM to formulate a plan which resolves into a structured MCP tool call. Second, \texttt{execute\_tool} consumes the request; if the tool exists, it is executed, and the monadic return value determines the structure of the resulting tool result block. Third, \texttt{synthesize\_answer} generates a final answer from the tool output. Finally, \texttt{format\_output} formats the final answer. Using \texttt{AgentMonad}, we chain these steps into a single, declarative workflow.
 
 \begin{lstlisting}[caption={Chaining agent steps using Monadic Context Engineering.}, label=lst:chain, language=Python]
-initial_state = {'task': 'What is a Monad?', 'history': []}
+task = "What is a Monad?"
+initial_state = AgentState(task=task)
 
 # The agent logic is defined as a single, declarative, and robust chain.
-final_flow = AgentMonad.start(initial_state) \
-    .then(plan_action)         \
-    .then(execute_tool)        \
-    .then(synthesize_answer)   \
-    .map(lambda answer: f"Final Report: {answer}") 
+final_flow = (
+    AgentMonad.start(initial_state)
+    .then(lambda s, _: plan_action(s, task))
+    .then(lambda s, call: execute_tool(s, call))
+    .then(synthesize_answer)
+    .then(format_output)
+)
 \end{lstlisting}
 
 \subsection{Robust Failure Handling}
@@ -262,11 +265,17 @@ While our core \texttt{AgentMonad} design, built on the transformer stack, can a
 The \texttt{AsyncAgentMonad} is the concrete implementation of our transformer stack. It provides a single, unified interface for chaining operations that are asynchronous, stateful, and fallible. An \texttt{AsyncAgentMonad[S, V]} does not hold a value directly; instead, it holds a \textit{promise} to eventually produce an \texttt{AgentMonad[S, V]}. The \texttt{bind} (\texttt{then}) operation chains asynchronous functions, allowing developers to write non-blocking I/O code that looks clean and sequential.
 
 \begin{lstlisting}[language=Python, caption={Chaining asynchronous steps with \texttt{AsyncAgentMonad}.}, label=lst:async_chain]
-# Each step is now an `async' function that returns an AgentMonad.
-async_flow = AsyncAgentMonad.start(initial_state) \
-    .then(async_plan_action) \
-    .then(async_execute_tool) \
+task = "What is a Monad?"
+initial_state = AgentState(task=task)
+
+# Each step is now an async function that returns an AgentMonad.
+async_flow = (
+    AsyncAgentMonad.start(initial_state)
+    .then(lambda s, _: async_plan_action(s, task))
+    .then(async_execute_tool)
     .then(async_synthesize_answer)
+    .then(async_format_output)
+)
 
 # The result is itself a promise, which must be awaited to run the flow.
 final_result_flow = await async_flow.run()

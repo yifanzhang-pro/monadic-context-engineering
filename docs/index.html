@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MCE - Monadic Context Engineering</title>
+  <title>MCE — Monadic Context Engineering</title>
 
   <meta name="description" content="Monadic Context Engineering (MCE) is a principled framework for AI agent orchestration using monad transformers, explicit state, error handling, and parallel applicatives.">
   <meta name="keywords" content="Monadic Context Engineering, MCE, AI Agents, Monads, Applicatives, Monad Transformers, Agent Orchestration, Async, Pydantic">
   <meta name="citation_title" content="Monadic Context Engineering">
   <meta name="citation_author" content="Yifan Zhang">
+  <meta name="citation_author" content="Mengdi Wang">
   <meta name="citation_publication_date" content="2025/09/11">
   <meta name="citation_pdf_url" content="https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf">
   <meta property="og:title" content="Monadic Context Engineering">
@@ -16,271 +17,119 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yifanzhang-pro.github.io/monadic-context-engineering/">
   <link rel="canonical" href="https://yifanzhang-pro.github.io/monadic-context-engineering/">
-  <link rel="icon" href="https://placehold.co/32x32/10211C/FFFFFF?text=MCE" type="image/x-icon">
+  <link rel="icon" href="https://placehold.co/32x32/0A2540/FFFFFF?text=M" type="image/x-icon">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        macros: { 
+            bm: ["\\mathbf{#1}", 1],
+            bind: ["\\texttt{bind}"],
+            map: ["\\texttt{map}"]
+        }
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
   <style>
     :root{
-      --primary-color:#10211c;
-      --secondary-color:#1d6b63;
-      --accent-color:#f08c4a;
-      --accent-soft:#ffe4d1;
-      --main-bg:#f7f2ea;
-      --content-bg:#eef3f2;
-      --text-main:#15241e;
-      --text-on-primary:#fdf8f2;
-      --link-color:#12524b;
-      --link-hover-color:#f08c4a;
-      --primary-color-rgb:16,33,28;
-      --link-color-rgb:18,82,75;
-      --border-color:rgba(16,33,28,0.12);
-      --shadow-color:rgba(16,33,28,0.16);
+      --primary-color:#0A2540;    /* PLI Blue / Deep Navy */
+      --accent-color:#00C2FF;     /* Cyan Accent */
+      --main-bg:#FFFFFF;
+      --content-bg:#F6F8FA;
+      --text-main:#2D2D2D;
+      --text-on-primary:#FFFFFF;
+      --link-color:var(--primary-color);
+      --link-hover-color:#143E73;
+      --primary-color-rgb:10,37,64;
+      --link-color-rgb:10,37,64;
+      --border-color:#e5e7eb;
+      --shadow-color:rgba(0,0,0,0.1);
     }
 
     html{scroll-behavior:smooth}
     body{
-      font-family:"Manrope", "Helvetica", sans-serif;
-      color:var(--text-main);
-      background:
-        radial-gradient(circle at 12% 20%, rgba(240, 140, 74, 0.18), transparent 45%),
-        radial-gradient(circle at 85% 10%, rgba(29, 107, 99, 0.2), transparent 40%),
-        linear-gradient(180deg, #fbf7f0 0%, #eef3f2 100%);
-      display:flex;
-      flex-direction:column;
-      min-height:100vh;
-      text-rendering:optimizeLegibility;
-      -webkit-font-smoothing:antialiased;
-      position:relative;
-      isolation:isolate;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text-main); background:var(--main-bg);
+      display:flex; flex-direction:column; min-height:100vh;
+      text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(16,33,28,0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(16,33,28,0.045) 1px, transparent 1px);
-      background-size:140px 140px;
-      opacity:0.45;
-      pointer-events:none;
-      z-index:0;
-    }
-
-    body > *{position:relative; z-index:1;}
-    main{flex:1 0 auto;}
 
     /* Navbar */
     .navbar{
       background:rgba(var(--primary-color-rgb),0.92);
-      backdrop-filter:blur(12px);
-      box-shadow:0 10px 25px rgba(16,33,28,0.25);
+      backdrop-filter:blur(10px);
+      box-shadow:0 2px 5px var(--shadow-color);
       position:sticky; top:0; z-index:100;
     }
-    .navbar .navbar-item, .navbar .navbar-link{
-      color:var(--text-on-primary);
-      font-weight:600;
-      letter-spacing:0.02em;
-    }
-    .navbar a.navbar-item:hover, .navbar .navbar-link:hover, .navbar-item.is-active{
-      color:var(--accent-color)!important;
-      background:transparent!important;
-    }
-    .navbar-burger{color:var(--text-on-primary);}
+    .navbar .navbar-item, .navbar .navbar-link{ color:var(--text-on-primary); font-weight:500; }
+    .navbar a.navbar-item:hover, .navbar .navbar-link:hover, .navbar-item.is-active{ color:var(--accent-color)!important; background:transparent!important; }
+    .navbar-burger{ color:var(--text-on-primary); }
 
     /* Hero */
-    .hero{
-      background:
-        radial-gradient(circle at 12% 10%, rgba(240, 140, 74, 0.32), transparent 45%),
-        linear-gradient(160deg, #0d1e19 0%, #163b32 55%, #0f2a24 100%);
-      color:var(--text-on-primary);
-      position:relative;
-      overflow:hidden;
-    }
-    .hero::before{
-      content:"";
-      position:absolute;
-      width:340px;
-      height:340px;
-      right:-60px;
-      top:-80px;
-      background:radial-gradient(circle, rgba(240, 140, 74, 0.55), transparent 70%);
-      border-radius:42% 58% 55% 45% / 45% 50% 50% 55%;
-      filter:blur(1px);
-      animation:drift 12s ease-in-out infinite;
-      opacity:0.9;
-    }
-    .hero::after{
-      content:"";
-      position:absolute;
-      width:280px;
-      height:280px;
-      left:-80px;
-      bottom:-90px;
-      background:radial-gradient(circle, rgba(29, 107, 99, 0.6), transparent 70%);
-      border-radius:54% 46% 48% 52% / 46% 60% 40% 54%;
-      filter:blur(1px);
-      animation:drift 15s ease-in-out infinite reverse;
-      opacity:0.8;
-    }
+    .hero{ background:linear-gradient(180deg, #0A2540 0%, #0e3055 100%); color:var(--text-on-primary); }
     .hero .title{
-      font-family:"Fraunces", serif;
-      font-weight:700;
-      color:var(--text-on-primary);
-      font-size:3.1rem;
-      line-height:1.05;
-      letter-spacing:-0.02em;
-      animation:rise 0.9s ease forwards;
+      font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--text-on-primary);
+      font-size:3.0rem; line-height:1.1;
     }
     .hero .subtitle.is-hero-subtitle{
-      color:rgba(253,248,242,0.9);
-      font-size:1.16rem;
-      max-width:980px;
-      margin:1.25rem auto 2rem auto;
-      line-height:1.7;
-      animation:rise 1.1s ease forwards;
+      color:rgba(255,255,255,0.92); font-size:1.18rem; max-width:980px; margin:1.25rem auto 2rem auto;
     }
-    .hero .subtitle .highlight{color:var(--accent-color); font-weight:600;}
+    .hero .subtitle .highlight{ color:var(--accent-color); font-weight:600; }
 
-    .project-links a{
-      color:var(--text-on-primary);
-      font-size:1.45rem;
-      margin:0 0.6rem;
-      transition:transform .25s ease, color .25s ease;
-    }
-    .project-links a:hover{color:var(--accent-color); transform:translateY(-2px);}
+    .project-links a{ color:var(--text-on-primary); font-size:1.45rem; margin:0 0.6rem; transition:transform .25s ease, color .25s ease; }
+    .project-links a:hover{ color:var(--accent-color); transform:translateY(-2px); }
 
-    /* Authors */
-    .authors-list{font-size:1.05rem; line-height:1.6; margin-top:1rem; color:rgba(253,248,242,0.92);}
-    .affiliations{font-size:0.9rem; color:rgba(253,248,242,0.7); margin-top:0.5rem;}
+    /* Authors List styling */
+    .authors-list { font-size: 1.1rem; line-height: 1.6; margin-top: 1rem; color: rgba(255,255,255,0.95); }
+    .affiliations { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 0.5rem; }
 
     /* Sections */
-    .section.content-section{padding:4.5rem 1.25rem; border-bottom:1px solid var(--border-color);}
-    .section.content-section:nth-child(even){background:var(--content-bg);}
+    .section.content-section{ padding:4.5rem 1.25rem; border-bottom:1px solid var(--border-color); }
+    .section.content-section:nth-child(even){ background:var(--content-bg); }
     .section-title{
-      font-family:"Space Grotesk", sans-serif;
-      font-weight:700;
-      color:var(--primary-color);
+      font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--primary-color);
       margin-bottom:2.2rem;
-      letter-spacing:-0.01em;
     }
-    .content{max-width:1000px; margin:0 auto; line-height:1.8; font-size:1.05rem;}
-    .content a{color:var(--link-color); font-weight:600; text-decoration:none; border-bottom:2px solid rgba(var(--link-color-rgb),.25);}
-    .content a:hover{color:var(--link-hover-color); border-bottom-color:var(--link-hover-color);}
+    .content{ max-width:1000px; margin:0 auto; line-height:1.8; font-size:1.06rem; }
+    .content a{ color:var(--link-color); font-weight:500; text-decoration:none; border-bottom:2px solid rgba(var(--link-color-rgb),.2); }
+    .content a:hover{ color:var(--link-hover-color); border-bottom-color:var(--link-hover-color); }
+    .content img{ display:block; margin:1.75rem auto; max-width:100%; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.08); }
 
-    /* Cards */
-    .feature-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-      gap:1.5rem;
-    }
-    .feature-card{
-      background:rgba(255,255,255,0.86);
-      border:1px solid var(--border-color);
-      border-radius:16px;
-      padding:1.5rem;
-      box-shadow:0 16px 32px var(--shadow-color);
-      min-height:180px;
-    }
-    .feature-card h4{
-      margin:0.4rem 0 0.6rem;
-      font-family:"Space Grotesk", sans-serif;
-      color:var(--primary-color);
-    }
-    .feature-kicker{
-      font-size:0.7rem;
-      letter-spacing:0.08em;
-      text-transform:uppercase;
-      color:var(--secondary-color);
-      font-weight:700;
-    }
-
-    /* Code */
+    /* Code & Pre */
     .content pre{
-      background:#0f1a17;
-      color:#e1f2ed;
-      border-radius:12px;
-      padding:1.2rem 1.3rem;
-      overflow:auto;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);
+      background:#0f172a; color:#cbd5e1; border-radius:8px; padding:1.1em 1.2em;
+      overflow:auto; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04);
       font-size:0.95rem;
     }
-    code{background:rgba(16,33,28,0.08); color:#1b2a24; padding:0.18em 0.38em; border-radius:4px; font-size:85%;}
-    pre code{background:transparent; color:inherit; padding:0; font-size:inherit; font-family:"Space Mono", monospace;}
+    code{ background:#f2f4f7; color:#1f2937; padding:0.18em 0.38em; border-radius:4px; font-size:85%; }
+    pre code{ background:transparent; color:inherit; padding:0; font-size:inherit; }
 
-    /* Pills */
-    .pill{display:inline-block; padding:.35rem .7rem; border-radius:999px; font-size:.82rem; background:var(--accent-soft); color:var(--primary-color); margin:.15rem .25rem; border:1px solid rgba(240, 140, 74, 0.3);}
-
-    /* Buttons */
-    .button.is-primary{
-      background:var(--accent-color);
-      border-color:var(--accent-color);
-      color:#231a12;
-      font-weight:700;
-    }
-    .button.is-primary:hover{
-      background:#f3a56d;
-      border-color:#f3a56d;
-      color:#231a12;
-    }
-    .button.is-link.is-light{
-      background:rgba(253,248,242,0.15);
-      border:1px solid rgba(253,248,242,0.28);
-      color:var(--text-on-primary);
-      font-weight:600;
-    }
-    .button.is-link.is-light:hover{
-      background:rgba(253,248,242,0.28);
-      color:var(--text-on-primary);
-    }
+    /* Badges / pills - PLI Style */
+    .pill{ display:inline-block; padding:.35rem .6rem; border-radius:999px; font-size:.82rem; background:#E6F7FF; color:#0A2540; margin:.15rem .25rem; border:1px solid #C8ECFF; }
 
     /* Footer */
     .footer{
-      background:var(--primary-color);
-      color:var(--text-on-primary);
-      padding:2rem 1.5rem;
-      border-top:3px solid var(--accent-color);
-      margin-top:auto;
+      background:var(--primary-color); color:var(--text-on-primary);
+      padding:2rem 1.5rem; border-top:3px solid var(--accent-color); margin-top:auto;
     }
-    .footer a{color:var(--accent-color); font-weight:600;}
-    .footer a:hover{color:#ffffff;}
+    .footer a{ color:var(--accent-color); font-weight:500; }
+    .footer a:hover{ color:#ffffff; }
 
-    /* Motion */
-    .reveal{opacity:0; transform:translateY(18px);}
-    .reveal.in-view{animation:fade-up 0.8s ease forwards;}
-    .stagger > *{opacity:0; transform:translateY(16px);}
-    .stagger.in-view > *{animation:fade-up 0.7s ease forwards;}
-    .stagger.in-view > *:nth-child(1){animation-delay:0.05s;}
-    .stagger.in-view > *:nth-child(2){animation-delay:0.12s;}
-    .stagger.in-view > *:nth-child(3){animation-delay:0.18s;}
-    .stagger.in-view > *:nth-child(4){animation-delay:0.24s;}
-
-    @keyframes fade-up{
-      to{opacity:1; transform:translateY(0);}
-    }
-    @keyframes rise{
-      from{opacity:0; transform:translateY(14px);}
-      to{opacity:1; transform:translateY(0);}
-    }
-    @keyframes drift{
-      0%,100%{transform:translate3d(0,0,0);}
-      50%{transform:translate3d(-12px, 18px, 0);}
-    }
-
-    @media (max-width: 900px){
-      .hero .title{font-size:2.5rem;}
-      .hero::before, .hero::after{display:none;}
-      .navbar .navbar-menu{background:rgba(var(--primary-color-rgb),0.96);}
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .hero::before, .hero::after, .reveal.in-view, .stagger.in-view > *{animation:none;}
-    }
+    /* Utility */
+    .mini-caption{ display:block; margin-top:.35rem; color:#6b7280; font-style:italic; text-align:center;}
+    .tight{ margin-top:0.5rem; margin-bottom:0.75rem; }
+    .columns.is-vcentered { align-items: center; }
   </style>
 </head>
 <body>
@@ -298,7 +147,7 @@
       <div id="navbarMenu" class="navbar-menu">
         <div class="navbar-end">
           <a href="#abstract" class="navbar-item">Abstract</a>
-          <a href="#stack" class="navbar-item">Monad Stack</a>
+          <a href="#stack" class="navbar-item">The Stack</a>
           <a href="#flow" class="navbar-item">Declarative Flow</a>
           <a href="#parallelism" class="navbar-item">Parallelism</a>
           <a href="#meta" class="navbar-item">Meta-Agents</a>
@@ -319,7 +168,7 @@
         </h2>
 
         <div class="authors-list">
-          <a href="https://yifzhang.com" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-color:var(--accent-color); text-underline-offset:4px; text-decoration-thickness:2px;">Yifan Zhang</a>
+          <a href="https://yifzhang.com" target="_blank" rel="noopener" style="color:inherit; text-decoration:underline; text-decoration-color:var(--accent-color); text-underline-offset:4px; text-decoration-thickness:2px;">Yifan Zhang</a>, Mengdi Wang
         </div>
         <div class="affiliations">
           Princeton University
@@ -342,27 +191,21 @@
   </header>
 
   <main>
-    <section id="abstract" class="section content-section reveal">
+    <section id="abstract" class="section content-section">
       <div class="container">
         <h2 class="title is-3 has-text-centered section-title">Abstract</h2>
         <div class="content has-text-justified" style="max-width:880px;">
           <p>
-            Large language model agents often rely on imperative orchestration that is difficult to
-            test, scale, or reason about. MCE introduces a formal, algebraic foundation based on
-            Functors, Applicatives, and Monads, enabling a uniform structure for stateful, fallible,
-            and asynchronous workflows. By stacking monad transformers, MCE composes these concerns
-            into a single, reusable interface for agent development.
+            Large language model agents often rely on imperative orchestration that is difficult to test, scale, or reason about. MCE introduces a formal, algebraic foundation based on Functors, Applicatives, and Monads, enabling a uniform structure for stateful, fallible, and asynchronous workflows. By stacking monad transformers, MCE composes these concerns into a single, reusable interface for agent development.
           </p>
           <p>
-            The result is a workflow model that reads like a specification while remaining runnable,
-            observable, and easy to extend with tool effects. Context, errors, and side effects are
-            explicit at the type level, so orchestration logic stays predictable as systems scale.
+            The result is a workflow model that reads like a specification while remaining runnable, observable, and easy to extend with tool effects. Context, errors, and side effects are explicit at the type level, so orchestration logic stays predictable as systems scale.
           </p>
           <p class="has-text-centered" style="margin-top:1.25rem;">
             <a class="button is-link is-light" href="https://github.com/yifanzhang-pro/monadic-context-engineering" target="_blank" rel="noopener">
               <span class="icon"><i class="fab fa-github"></i></span><span>Code and Library</span>
             </a>
-            <a class="button is-primary" href="https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf" target="_blank" rel="noopener">
+            <a class="button is-primary" style="background:var(--primary-color);" href="https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf" target="_blank" rel="noopener">
               <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Read the Paper</span>
             </a>
           </p>
@@ -370,124 +213,139 @@
       </div>
     </section>
 
-    <section id="stack" class="section content-section reveal">
+    <section id="stack" class="section content-section">
       <div class="container">
-        <h2 class="title is-3 has-text-centered section-title">Monad Stack</h2>
+        <h2 class="title is-3 has-text-centered section-title">The Monad Stack</h2>
         <div class="content">
           <p>
-            MCE models every run as a transformer stack that composes state, error handling, and
-            effects into a single algebra. Each layer is swappable, so you can change persistence,
-            error types, or execution backends without rewriting workflows.
+            MCE models every run as a transformer stack that composes state, error handling, and effects into a single algebra. The formal type signature of the <strong>AgentMonad</strong> encapsulates these capabilities via the <strong>General Relative Law</strong> of context composition:
           </p>
-          <div class="feature-grid stagger" style="margin-top:2rem;">
-            <div class="feature-card">
-              <div class="feature-kicker">StateT</div>
-              <h4>Context as a first-class value</h4>
-              <p>Thread agent memory, tool outputs, and intermediate plans without manual plumbing.</p>
+          <p class="has-text-centered">
+            $$ \text{AgentMonad} \cong S \to \text{IO}(\text{Either}(E, (A, S))) $$
+          </p>
+          
+          <div class="columns is-vcentered" style="margin-top:2rem;">
+            <div class="column is-6">
+                <div class="box has-text-centered" style="height:100%;">
+                    <h4 class="title is-5" style="color:var(--primary-color);">The Context Stack</h4>
+                    <p class="tight"><strong>Structure:</strong> Monad Transformers</p>
+                    <hr>
+                    <div style="text-align:left; font-size:0.95rem;">
+                        <p><strong>1. StateT:</strong> Context as a first-class value. Threads memory and tool outputs without plumbing.</p>
+                        <p><strong>2. EitherT:</strong> Deterministic failures. Short-circuits execution upon error with structured info.</p>
+                        <p><strong>3. Task / IO:</strong> Explicit effects. Encapsulates async tool calls and side effects.</p>
+                    </div>
+                </div>
             </div>
-            <div class="feature-card">
-              <div class="feature-kicker">EitherT</div>
-              <h4>Deterministic failures</h4>
-              <p>Short-circuit errors with structured context and predictable recovery semantics.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-kicker">Task / IO</div>
-              <h4>Explicit effects</h4>
-              <p>Encapsulate tool calls and async work so every side effect is testable and observable.</p>
+            <div class="column is-6">
+                <div class="box has-text-centered" style="height:100%;">
+                    <h4 class="title is-5" style="color:#0085bd;">The Algebraic Interface</h4>
+                    <p class="tight"><strong>Operation:</strong> Functor / Applicative / Monad</p>
+                    <hr>
+                    <div style="text-align:left; font-size:0.95rem;">
+                        <p><strong>$\text{map} (f)$:</strong> Transform values purely within the context.</p>
+                        <p><strong>$\text{then} (f)$:</strong> Sequence dependent steps (The "Railway"). Fails fast if previous step errored.</p>
+                        <p><strong>$\text{gather} ([f])$:</strong> Run independent async flows in parallel (Applicative).</p>
+                    </div>
+                </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="flow" class="section content-section reveal">
+    <section id="flow" class="section content-section">
       <div class="container">
         <h2 class="title is-3 has-text-centered section-title">Declarative Flow</h2>
         <div class="content">
-          <div class="columns is-vcentered" style="margin-top:1rem;">
-            <div class="column is-6">
-              <p>
-                The AgentMonad exposes a small surface area: <code>then</code> for sequencing,
-                <code>map</code> for pure transforms, and <code>gather</code> for parallel branches.
-                Workflows stay linear and readable while retaining full introspection.
-              </p>
-            </div>
-            <div class="column is-6">
-              <pre><code>// The workflow reads like a spec.
-flow = AgentMonad.start(initial_state)
-  .then(plan_action)
-  .then(execute_tool)
-  .then(synthesize_answer)
-  .then(format_output)</code></pre>
-            </div>
-          </div>
+          <p>
+            The <code>AgentMonad</code> exposes a small surface area for sequencing. Workflows stay linear and readable while retaining full introspection. The code below demonstrates how a complex agent loop reads like a linear specification.
+          </p>
+
+          <h4 class="title is-5 tight">Sequential Logic</h4>
+          <pre><code># The workflow reads like a high-level spec.
+# Failures in any step automatically short-circuit the rest of the chain.
+
+flow = AgentMonad.start(initial_state) \
+    .then(plan_action)        \
+    .then(execute_tool)       \
+    .then(synthesize_answer)  \
+    .then(format_output)</code></pre>
+          
+          <p class="has-text-centered is-size-7 mt-3">
+             Logic is separated from orchestration. Each function focuses on one task, while the Monad handles the "glue".
+          </p>
         </div>
       </div>
     </section>
 
-    <section id="parallelism" class="section content-section reveal">
+    <section id="parallelism" class="section content-section">
       <div class="container">
         <h2 class="title is-3 has-text-centered section-title">Applicative Parallelism</h2>
         <div class="content">
-          <div class="columns is-vcentered" style="margin-top:1rem;">
-            <div class="column is-6">
-              <p>
-                Independent tasks can be run concurrently with <code>AsyncAgentMonad.gather</code>.
-                The result preserves ordering and merges shared state with a configurable strategy,
-                while keeping error handling deterministic.
-              </p>
-            </div>
-            <div class="column is-6">
-              <pre><code>gathered = AsyncAgentMonad.gather([
-  news_flow,
-  weather_flow,
-  stocks_flow,
+          <p>
+            While Monads sequence dependent tasks, Applicative Functors handle independent ones. Using <code>AsyncAgentMonad.gather</code>, MCE allows agents to branch out, execute multiple IO-bound tool calls concurrently, and merge results back into the main context.
+          </p>
+
+          <h4 class="title is-5 tight">Parallel Execution</h4>
+          <pre><code># Independent tasks run concurrently via Applicative 'gather'.
+# The result preserves ordering and handles global timeout/failure.
+
+gathered_flow = AsyncAgentMonad.gather([
+    news_agent_flow,
+    weather_agent_flow,
+    stocks_agent_flow,
 ])
-result = await gathered.run()</code></pre>
-            </div>
-          </div>
+
+# 'result' contains the combined output of all sub-agents
+result = await gathered_flow.run()</code></pre>
+
+          <p>
+            This creates a <strong>Fork-Join</strong> topology purely through algebraic composition, recovering high-performance concurrency patterns without manual thread management.
+          </p>
         </div>
       </div>
     </section>
 
-    <section id="meta" class="section content-section reveal">
+    <section id="meta" class="section content-section">
       <div class="container">
         <h2 class="title is-3 has-text-centered section-title">Meta-Agents</h2>
         <div class="content">
           <p>
-            Meta-agents operate on workflows instead of raw data. They synthesize sub-agent chains,
-            run them, and combine results into a higher-level monadic context. MCE keeps these
-            systems predictable by reusing the same algebra at every layer.
+            Meta-agents operate on workflows instead of raw data. They synthesize sub-agent chains, run them, and combine results into a higher-level monadic context. MCE keeps these systems predictable by reusing the same algebra at every layer.
           </p>
-          <div class="feature-grid stagger" style="margin-top:2rem;">
-            <div class="feature-card">
-              <div class="feature-kicker">Planner</div>
-              <h4>Compose subflows</h4>
-              <p>Build new agent graphs from reusable primitives and apply policy constraints.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-kicker">Evaluator</div>
-              <h4>Score and repair</h4>
-              <p>Validate outputs, reroute failures, and produce structured feedback loops.</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-kicker">Governor</div>
-              <h4>Control tools</h4>
-              <p>Gate expensive calls, enforce budgets, and log traces with minimal coupling.</p>
-            </div>
+          <div class="columns is-centered is-multiline" style="margin-top:1rem;">
+             <div class="column is-4">
+               <div class="box" style="height:100%">
+                 <h5 class="title is-6 has-text-primary">Planner</h5>
+                 <p class="is-size-7">Build new agent graphs from reusable primitives and apply policy constraints.</p>
+               </div>
+             </div>
+             <div class="column is-4">
+               <div class="box" style="height:100%">
+                 <h5 class="title is-6 has-text-primary">Evaluator</h5>
+                 <p class="is-size-7">Score and repair outputs, rerouting failures to new monadic branches.</p>
+               </div>
+             </div>
+             <div class="column is-4">
+               <div class="box" style="height:100%">
+                 <h5 class="title is-6 has-text-primary">Governor</h5>
+                 <p class="is-size-7">Gate expensive calls, enforce budgets, and log traces with minimal coupling.</p>
+               </div>
+             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="citation" class="section content-section reveal">
+    <section id="citation" class="section content-section">
       <div class="container">
         <h2 class="title is-3 has-text-centered section-title">Citation</h2>
         <div class="content">
           <p>If you find this work useful, please cite:</p>
 <pre id="cite-bibtex"><code>@article{zhang2025monadic,
   title   = {Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
-  author  = {Zhang, Yifan},
+  author  = {Zhang, Yifan and Wang, Mengdi},
   year    = {2025},
   month   = {sep},
   journal = {Github},
@@ -520,35 +378,38 @@ result = await gathered.run()</code></pre>
   </footer>
 
   <script>
+    // Mobile navbar toggle
     document.addEventListener('DOMContentLoaded', () => {
-      const burgers = Array.from(document.querySelectorAll('.navbar-burger'));
-      burgers.forEach(el => {
+      const $burgers = Array.from(document.querySelectorAll('.navbar-burger'));
+      $burgers.forEach(el => {
         el.addEventListener('click', () => {
           const target = el.dataset.target;
-          const menu = document.getElementById(target);
+          const $target = document.getElementById(target);
           el.classList.toggle('is-active');
-          menu.classList.toggle('is-active');
+          $target.classList.toggle('is-active');
         });
       });
 
-      const observer = new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('in-view');
-            }
-          });
-        },
-        { threshold: 0.2 }
-      );
-      document.querySelectorAll('.reveal, .stagger').forEach(el => observer.observe(el));
+      // Hex -> rgb helper
+      function hexToRgb(hex){
+        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return m ? { r:parseInt(m[1],16), g:parseInt(m[2],16), b:parseInt(m[3],16) } : null;
+      }
+      const root = document.documentElement;
+      const styles = getComputedStyle(root);
+      const p = styles.getPropertyValue('--primary-color').trim();
+      const l = styles.getPropertyValue('--link-color').trim();
+      const prgb = hexToRgb(p), lrgb = hexToRgb(l);
+      if(prgb){ root.style.setProperty('--primary-color-rgb', `${prgb.r}, ${prgb.g}, ${prgb.b}`); }
+      if(lrgb){ root.style.setProperty('--link-color-rgb', `${lrgb.r}, ${lrgb.g}, ${lrgb.b}`); }
 
+      // Copy BibTeX
       const btn = document.getElementById('copy-cite');
       const pre = document.getElementById('cite-bibtex');
-      if (btn && pre) {
+      if(btn && pre){
         btn.addEventListener('click', async () => {
           const text = pre.innerText;
-          try {
+          try{
             await navigator.clipboard.writeText(text);
             btn.classList.add('is-success');
             btn.classList.remove('is-link','is-light');
@@ -558,13 +419,13 @@ result = await gathered.run()</code></pre>
               btn.classList.add('is-link','is-light');
               btn.innerHTML = '<span class="icon"><i class="fas fa-clipboard"></i></span><span>Copy BibTeX</span>';
             }, 1600);
-          } catch (e) {
+          }catch(e){
             const range = document.createRange();
             range.selectNode(pre);
             const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
-            try { document.execCommand('copy'); } catch (_) {}
+            try{ document.execCommand('copy'); }catch(_){}
             sel.removeAllRanges();
           }
         });
