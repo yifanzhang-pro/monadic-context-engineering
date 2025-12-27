@@ -65,7 +65,7 @@ The default steps are deterministic. To use a live LLM call via OpenRouter:
 
 ```bash
 export OPENROUTER_API_KEY="your-key"
-export OPENROUTER_MODEL="google/gemini-3-flash-preview"
+export OPENROUTER_MODEL="x-ai/grok-4.1-fast"
 ```
 
 ```python

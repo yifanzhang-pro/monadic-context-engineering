@@ -15,7 +15,7 @@ class ChatMessage(TypedDict):
 @dataclass(frozen=True)
 class OpenRouterConfig:
     api_key: str
-    model: str = "openai/gpt-4o-mini"
+    model: str = "x-ai/grok-4.1-fast"
     base_url: str = "https://openrouter.ai/api/v1"
     referer: str | None = None
     title: str | None = None
@@ -32,7 +32,7 @@ class OpenRouterClient:
         if not api_key:
             raise ValueError("OPENROUTER_API_KEY is required to call OpenRouter.")
 
-        model = os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+        model = os.environ.get("OPENROUTER_MODEL", "x-ai/grok-4.1-fast")
         base_url = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
         referer = os.environ.get("OPENROUTER_REFERER")
         title = os.environ.get("OPENROUTER_TITLE")
