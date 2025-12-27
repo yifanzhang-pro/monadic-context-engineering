@@ -59,7 +59,7 @@ else:
     print("Failure:", flow.error_info)
 ```
 
-## OpenRouter (Optional)
+## OpenRouter 
 
 The default steps are deterministic. To use a live LLM call via OpenRouter:
 
