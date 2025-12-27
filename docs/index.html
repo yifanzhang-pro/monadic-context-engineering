@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monadic Context Engineering</title>
+
+  <meta name="description" content="Monadic Context Engineering: a principled framework for AI agent orchestration with monads, applicatives, and structured state/error handling.">
+  <meta name="keywords" content="Monadic Context Engineering, MCE, AI Agents, Monads, Applicative, Agent Orchestration">
+  <meta name="citation_title" content="Monadic Context Engineering">
+  <meta name="citation_author" content="Yifan Zhang">
+  <meta name="citation_publication_date" content="2025/09/11">
+  <meta name="citation_pdf_url" content="https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf">
+
+  <link rel="canonical" href="https://yifanzhang-pro.github.io/monadic-context-engineering/">
+  <link rel="icon" href="https://placehold.co/32x32/1B3A34/FFFFFF?text=MCE" type="image/x-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;600;700&family=Manrope:wght@300;500;700&family=Space+Mono&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #132721;
+      --paper: #f6f3eb;
+      --mist: #efe9dd;
+      --accent: #c05f3a;
+      --accent-2: #1b5f5a;
+      --code-bg: #141d1a;
+      --code-ink: #e2e8e2;
+      --shadow: rgba(19, 39, 33, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(192, 95, 58, 0.12), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(27, 95, 90, 0.12), transparent 40%),
+        linear-gradient(180deg, var(--paper), var(--mist));
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      background: rgba(246, 243, 235, 0.8);
+      border-bottom: 1px solid rgba(19, 39, 33, 0.12);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      padding: 0.3rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+
+    .nav-links a:hover {
+      border-color: rgba(19, 39, 33, 0.2);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .hero {
+      position: relative;
+      padding: 5rem 1.5rem 3rem;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 1.5rem 1.5rem auto auto;
+      width: 180px;
+      height: 180px;
+      background: linear-gradient(135deg, rgba(192, 95, 58, 0.3), rgba(27, 95, 90, 0.3));
+      border-radius: 32% 68% 56% 44% / 42% 45% 55% 58%;
+      filter: blur(0.5px);
+      animation: drift 12s ease-in-out infinite;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      font-size: clamp(2.2rem, 3.5vw, 3.8rem);
+      margin: 0 0 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin: 0 0 1.5rem;
+    }
+
+    .hero .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .tag {
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(27, 95, 90, 0.12);
+      border: 1px solid rgba(27, 95, 90, 0.2);
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(19, 39, 33, 0.1);
+      border-radius: 18px;
+      padding: 1.8rem;
+      box-shadow: 0 20px 40px var(--shadow);
+      animation: rise 1s ease forwards;
+    }
+
+    .hero-card h3 {
+      margin: 0 0 1rem;
+      font-family: "Fraunces", serif;
+    }
+
+    .hero-card ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.65rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid var(--accent-2);
+      background: var(--accent-2);
+      color: #fefcf7;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--accent-2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(27, 95, 90, 0.2);
+    }
+
+    .section {
+      padding: 4rem 1.5rem;
+    }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 2rem;
+    }
+
+    .section h2 {
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+      margin: 0;
+    }
+
+    .section p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin: 0;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(19, 39, 33, 0.12);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 30px rgba(19, 39, 33, 0.12);
+      min-height: 170px;
+    }
+
+    .feature span {
+      display: inline-block;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .code-block {
+      background: var(--code-bg);
+      color: var(--code-ink);
+      padding: 1.5rem;
+      border-radius: 16px;
+      font-family: "Space Mono", monospace;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      box-shadow: 0 20px 40px rgba(20, 29, 26, 0.35);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .citation {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px dashed rgba(19, 39, 33, 0.3);
+      padding: 1.5rem;
+      border-radius: 18px;
+    }
+
+    .footer {
+      margin-top: auto;
+      padding: 2rem 1.5rem 3rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: rgba(19, 39, 33, 0.7);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .reveal.in-view {
+      animation: fade-up 0.8s ease forwards;
+    }
+
+    @keyframes fade-up {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes drift {
+      0%, 100% {
+        transform: translate3d(0, 0, 0);
+      }
+      50% {
+        transform: translate3d(-12px, 18px, 0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+      .hero::before {
+        display: none;
+      }
+      .nav-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero::before,
+      .hero-card,
+      .reveal.in-view {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav">
+      <div class="nav-inner">
+        <div class="logo">Monadic Context Engineering</div>
+        <div class="nav-links">
+          <a href="#abstract">Abstract</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#parallelism">Parallelism</a>
+          <a href="#meta">Meta-Agents</a>
+          <a href="#citation">Citation</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-inner">
+        <div>
+          <h1>Monadic Context Engineering</h1>
+          <p>
+            A principled framework for AI agent orchestration that treats workflows as composable
+            computations with built-in state propagation, error short-circuiting, and parallelism.
+          </p>
+          <div class="tags">
+            <div class="tag">StateT + EitherT + IO</div>
+            <div class="tag">Python + Pydantic</div>
+            <div class="tag">Async Applicatives</div>
+          </div>
+          <div class="hero-actions">
+            <a class="btn" href="https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf" target="_blank" rel="noopener noreferrer">Read the paper</a>
+            <a class="btn secondary" href="https://github.com/yifanzhang-pro/monadic-context-engineering" target="_blank" rel="noopener noreferrer">View code</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <h3>Why MCE?</h3>
+          <ul>
+            <li>Linear, declarative agent workflows.</li>
+            <li>State, errors, and effects are always explicit.</li>
+            <li>Parallelizable steps via Applicative gather.</li>
+            <li>Composable building blocks for meta-agents.</li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <section id="abstract" class="section">
+      <div class="section-inner reveal">
+        <h2>Abstract</h2>
+        <p>
+          Large language model agents often rely on imperative orchestration that is difficult to
+          test, scale, or reason about. MCE introduces a formal, algebraic foundation based on
+          Functors, Applicatives, and Monads, enabling a uniform structure for stateful, fallible,
+          and asynchronous workflows. By stacking monad transformers, MCE composes these concerns
+          into a single, reusable interface for agent development.
+        </p>
+      </div>
+    </section>
+
+    <section id="architecture" class="section">
+      <div class="section-inner reveal">
+        <h2>Architecture</h2>
+        <div class="feature-grid">
+          <div class="feature">
+            <span>StateT</span>
+            <p>Thread agent memory and history through every step without manual bookkeeping.</p>
+          </div>
+          <div class="feature">
+            <span>EitherT</span>
+            <p>Short-circuit failures and preserve error context with deterministic behavior.</p>
+          </div>
+          <div class="feature">
+            <span>IO/Task</span>
+            <p>Encapsulate side effects so tool calls are explicit and testable.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-inner reveal split">
+        <div>
+          <h2>Declarative Flow</h2>
+          <p>
+            The AgentMonad exposes a small surface area: `then` for sequencing, `map` for pure
+            transformations, and `gather` for parallel branches. Each step stays independent and
+            composable.
+          </p>
+        </div>
+        <div class="code-block">
+<pre># The workflow reads like a spec.
+flow = AgentMonad.start(initial_state) \
+    .then(plan_action) \
+    .then(execute_tool) \
+    .then(synthesize_answer) \
+    .then(format_output)
+</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="parallelism" class="section">
+      <div class="section-inner reveal split">
+        <div>
+          <h2>Applicative Parallelism</h2>
+          <p>
+            Independent tasks can be run concurrently with `AsyncAgentMonad.gather`. This produces
+            a single flow that resolves to a list of results and preserves state with a configurable
+            merge strategy.
+          </p>
+        </div>
+        <div class="code-block">
+<pre>gathered = AsyncAgentMonad.gather([
+    news_flow,
+    weather_flow,
+    stocks_flow,
+])
+result = await gathered.run()</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="meta" class="section">
+      <div class="section-inner reveal">
+        <h2>Meta-Agents</h2>
+        <p>
+          Meta-agents operate on workflows instead of raw data. They dynamically synthesize
+          sub-agent chains, run them, and gather results into a higher-level monadic context. MCE
+          keeps these multi-agent systems predictable by reusing the same core algebra.
+        </p>
+      </div>
+    </section>
+
+    <section id="citation" class="section">
+      <div class="section-inner reveal">
+        <h2>Citation</h2>
+        <div class="citation code-block">
+<pre>@article{zhang2025monadic,
+  title   = {Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
+  author  = {Zhang, Yifan and et al.},
+  year    = {2025},
+  month   = {sep},
+  journal = {Github},
+  url     = {https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf}
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Monadic Context Engineering • Princeton University</p>
+    </footer>
+  </div>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    reveals.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
