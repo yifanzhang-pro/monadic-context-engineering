@@ -59,6 +59,32 @@ else:
     print("Failure:", flow.error_info)
 ```
 
+## OpenRouter (Optional)
+
+The default steps are deterministic. To use a live LLM call via OpenRouter:
+
+```bash
+export OPENROUTER_API_KEY="your-key"
+export OPENROUTER_MODEL="google/gemini-3-flash-preview"
+```
+
+```python
+from mce.steps import run_openrouter_agent
+
+flow = run_openrouter_agent("What is a Monad?")
+if flow.is_successful:
+    print(flow.value)
+else:
+    print("Failure:", flow.error_info)
+```
+
+Optional environment variables:
+
+- `OPENROUTER_BASE_URL` (default: `https://openrouter.ai/api/v1`)
+- `OPENROUTER_REFERER` (sets `HTTP-Referer`)
+- `OPENROUTER_TITLE` (sets `X-Title`)
+- `OPENROUTER_TIMEOUT_S` (default: `30`)
+
 ## Tooling
 
 - Type checking: `pyright`
@@ -73,8 +99,9 @@ pytest
 
 ## Notes
 
-- The implementation follows the conceptual design in the paper, including the `AgentMonad` and `AsyncAgentMonad` APIs.
-- The example steps are deterministic and self-contained; they do not call external APIs.
+- The implementation follows the conceptual design in the paper, including the `AgentMonad`
+  and `AsyncAgentMonad` APIs.
+- The default example steps are deterministic and self-contained; use OpenRouter for live LLM calls.
 
 ## Citations
 

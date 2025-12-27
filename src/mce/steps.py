@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .llm import OpenRouterClient
 from .models import AgentState, ToolCall, ToolRegistry, default_registry
 from .monads import AgentMonad
 
@@ -31,6 +32,33 @@ def synthesize_answer(state: AgentState, tool_output: str) -> AgentMonad[AgentSt
     return AgentMonad.success(next_state, answer)
 
 
+def synthesize_answer_openrouter(
+    state: AgentState,
+    tool_output: str,
+    client: OpenRouterClient | None = None,
+) -> AgentMonad[AgentState, str]:
+    client = client or OpenRouterClient.from_env()
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a helpful assistant."
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                f"Task: {state.task}\n\n"
+                f"Tool evidence:\n{tool_output}\n\n"
+                "Write the final answer in 3-6 sentences."
+            ),
+        },
+    ]
+    answer = client.chat(messages)
+    next_state = state.with_history("Synthesized final answer with OpenRouter.")
+    return AgentMonad.success(next_state, answer)
+
+
 def format_output(state: AgentState, answer: str) -> AgentMonad[AgentState, str]:
     formatted = f"Final Report:\n{answer}"
     next_state = state.with_history("Formatted response for delivery.")
@@ -44,5 +72,18 @@ def run_simple_agent(task: str) -> AgentMonad[AgentState, str]:
         .then(lambda s, _: plan_action(s, task))
         .then(lambda s, call: execute_tool(s, call))
         .then(synthesize_answer)
+        .then(format_output)
+    )
+
+
+def run_openrouter_agent(
+    task: str, client: OpenRouterClient | None = None
+) -> AgentMonad[AgentState, str]:
+    initial_state = AgentState(task=task)
+    return (
+        AgentMonad.start(initial_state)
+        .then(lambda s, _: plan_action(s, task))
+        .then(lambda s, call: execute_tool(s, call))
+        .then(lambda s, output: synthesize_answer_openrouter(s, output, client=client))
         .then(format_output)
     )
