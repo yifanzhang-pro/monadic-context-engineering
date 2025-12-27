@@ -218,8 +218,7 @@
         <h2 class="title is-3 has-text-centered section-title">The Monad Stack</h2>
         <div class="content">
           <p>
-            MCE models every run as a transformer stack that composes state, error handling, and effects into a single algebra. The formal type signature of the <strong>AgentMonad</strong> encapsulates these capabilities via the <strong>General Relative Law</strong> of context composition:
-          </p>
+            MCE models every run as a transformer stack that composes state, error handling, and effects into a single algebra. The formal type signature of the <strong>AgentMonad</strong> encapsulates these capabilities via <strong>Monad Transformer</strong> composition:          </p>
           <p class="has-text-centered">
             $$ \text{AgentMonad} \cong S \to \text{IO}(\text{Either}(E, (A, S))) $$
           </p>
