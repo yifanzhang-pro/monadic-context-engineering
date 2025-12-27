@@ -107,7 +107,7 @@ pytest
 
 ```bibtex
 @article{zhang2025monadic,
-  title   = {Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
+  title   = {Monadic Context Engineering},
   author  = {Zhang, Yifan and Wang, Mengdi},
   year    = {2025},
   month   = {Dec},
