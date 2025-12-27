@@ -75,3 +75,16 @@ pytest
 
 - The implementation follows the conceptual design in the paper, including the `AgentMonad` and `AsyncAgentMonad` APIs.
 - The example steps are deterministic and self-contained; they do not call external APIs.
+
+## Citations
+
+```bibtex
+@article{zhang2025monadic,
+  title   = {Monadic Context Engineering: A Principled Framework for AI Agent Orchestration},
+  author  = {Zhang, Yifan and Wang, Mengdi},
+  year    = {2025},
+  month   = {Dec},
+  journal = {Github},
+  url     = {https://yifanzhang-pro.github.io/monadic-context-engineering/MCE.pdf}
+}
+```
