@@ -265,11 +265,16 @@
           <pre><code># The workflow reads like a high-level spec.
 # Failures in any step automatically short-circuit the rest of the chain.
 
-flow = AgentMonad.start(initial_state) \
-    .then(plan_action)        \
-    .then(execute_tool)       \
-    .then(synthesize_answer)  \
-    .then(format_output)</code></pre>
+task = "What is a Monad?"
+initial_state = AgentState(task=task)
+
+flow = (
+    AgentMonad.start(initial_state)
+    .then(lambda s, _: plan_action(s, task))
+    .then(lambda s, call: execute_tool(s, call))
+    .then(synthesize_answer)
+    .then(format_output)
+)</code></pre>
           
           <p class="has-text-centered is-size-7 mt-3">
              Logic is separated from orchestration. Each function focuses on one task, while the Monad handles the "glue".
@@ -288,7 +293,7 @@ flow = AgentMonad.start(initial_state) \
 
           <h4 class="title is-5 tight">Parallel Execution</h4>
           <pre><code># Independent tasks run concurrently via Applicative 'gather'.
-# The result preserves ordering and handles global timeout/failure.
+# The result preserves ordering and propagates the first failure.
 
 gathered_flow = AsyncAgentMonad.gather([
     news_agent_flow,
@@ -296,8 +301,9 @@ gathered_flow = AsyncAgentMonad.gather([
     stocks_agent_flow,
 ])
 
-# 'result' contains the combined output of all sub-agents
-result = await gathered_flow.run()</code></pre>
+# The final AgentMonad holds the combined outputs in .value
+result_flow = await gathered_flow.run()
+combined = result_flow.value</code></pre>
 
           <p>
             This creates a <strong>Fork-Join</strong> topology purely through algebraic composition, recovering high-performance concurrency patterns without manual thread management.
