@@ -1,7 +1,7 @@
 # Monadic Context Engineering
 
-[![Website](https://img.shields.io/badge/Project-Website-green)](https://yifanzhang-pro.github.io/monadic-context-engineering)
-![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)
+[![Website](https://img.shields.io/badge/Project-Website-blue)](https://yifanzhang-pro.github.io/monadic-context-engineering)
+![Python 3.13+](https://img.shields.io/badge/python-3.13+-green.svg)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](https://opensource.org/license/apache-2-0)
 
 Monadic Context Engineering (MCE) is a principled architecture for AI agent orchestration that treats workflows as composable computations in a shared context. It formalizes how state, errors, and side effects propagate through agent steps, using the algebraic structures of Functors, Applicatives, and Monads.
